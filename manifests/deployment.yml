@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "akscluster01-fdc6"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "akscluster01-fdc6"
+  template:
+    metadata:
+      labels:
+        app: "akscluster01-fdc6"
+    spec:
+      containers:
+        - name: "akscluster01-fdc6"
+          image: "bytestream.azurecr.io/akscluster01"
+          ports:
+          - containerPort: 80
