@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoApi.Models;
 using Microsoft.OpenApi.Models;
 using TodoApi.Services;
+using Azure.AI.OpenAI;
 
 namespace TodoApi
 {
@@ -62,10 +63,10 @@ namespace TodoApi
 
             services.AddSingleton<SentimentAnalysisService>(provider =>
             {
-                var httpClient = new HttpClient();
                 var apiKey = Configuration["AzureOpenAI:ApiKey"];
                 var endpoint = Configuration["AzureOpenAI:Endpoint"];
-                return new SentimentAnalysisService(httpClient, apiKey, endpoint);
+                var openAIClient = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+                return new SentimentAnalysisService(openAIClient, apiKey, endpoint);
             });
         }
 
