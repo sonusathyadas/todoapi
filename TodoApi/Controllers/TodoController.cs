@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoApi.Models;
+using TodoApi.Services;
 
 namespace TodoApi.Controllers
 {
@@ -15,10 +16,12 @@ namespace TodoApi.Controllers
     public class TodoController : ControllerBase
     {
         private TodoContext db;
+        private readonly SentimentAnalysisService _sentimentAnalysisService;
 
-        public TodoController(TodoContext dbContext)
+        public TodoController(TodoContext dbContext, SentimentAnalysisService sentimentAnalysisService)
         {
             this.db = dbContext;
+            _sentimentAnalysisService = sentimentAnalysisService;
         }
 
         [HttpGet]
@@ -102,6 +105,20 @@ namespace TodoApi.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [HttpPost("analyze-sentiment")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<string>> AnalyzeSentiment([FromBody] string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return BadRequest("Text cannot be null or empty.");
+            }
+
+            var sentiment = await _sentimentAnalysisService.AnalyzeSentimentAsync(text);
+            return Ok(sentiment);
         }
     }
 }
